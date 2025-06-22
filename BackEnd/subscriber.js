@@ -1,4 +1,5 @@
 const mqtt = require('mqtt');
+const mysql = require('mysql2');
 const deviceUUID = '54769dfca8d4417bb9ab6f78';
 
 const client = mqtt.connect('mqtt://localhost:1883');
