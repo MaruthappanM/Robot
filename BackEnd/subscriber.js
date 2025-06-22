@@ -11,7 +11,7 @@ client.on('connect', () => {
 
 client.on('message', (topic, message) => {
   const data = JSON.parse(message.toString());
-  console.log('📥 Received:', data);
+  console.log('📥 Received data:', data);
 
   // Simulate processing success
   const ack = {
