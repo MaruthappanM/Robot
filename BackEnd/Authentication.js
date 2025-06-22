@@ -26,8 +26,8 @@ mqttClient.on('error', (err) => {
 });
 
 // SSL Certs
-const privateKey = fs.readFileSync('../CERT/key.pem', 'utf8');
-const certificate = fs.readFileSync('../CERT/cert.pem', 'utf8');
+const privateKey = fs.readFileSync('./CERT/key.pem', 'utf8');
+const certificate = fs.readFileSync('./CERT/cert.pem', 'utf8');
 const credentials = { key: privateKey, cert: certificate };
 
 // Middleware
