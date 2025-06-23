@@ -95,7 +95,7 @@ db.connect(err => {
     comm_port VARCHAR(50),
     status ENUM('OPERATIONAL', 'INACTIVE', 'FAULT') DEFAULT 'OPERATIONAL',
     installation_date DATETIME,
-    created_by INT NOT NULL,
+    created_by NULL,
     created DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_by INT,
     updated DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
