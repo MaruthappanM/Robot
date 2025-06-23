@@ -102,8 +102,8 @@ db.connect(err => {
     last_command JSON,
     btn TINYINT(1) DEFAULT 0,
     FOREIGN KEY (location) REFERENCES rtbl_locations(id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES rtbl_accounts(id) ON DELETE SET NULL,
-    FOREIGN KEY (updated_by) REFERENCES rtbl_accounts(id) ON DELETE SET NULL
+    FOREIGN KEY (created_by) REFERENCES rtbl_accounts_dts(id) ON DELETE SET NULL,
+    FOREIGN KEY (updated_by) REFERENCES rtbl_accounts_dts(id) ON DELETE SET NULL
   );
   CREATE TABLE IF NOT EXISTS rtbl_commands (
     id VARCHAR(24) PRIMARY KEY,
@@ -115,7 +115,7 @@ db.connect(err => {
     created_by VARCHAR(24) NOT NULL,
     created DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (robot_id) REFERENCES rtbl_robots(id) ON DELETE CASCADE,
-    FOREIGN KEY (created_by) REFERENCES rtbl_accounts(id) ON DELETE SET NULL
+    FOREIGN KEY (created_by) REFERENCES rtbl_accounts_dts(id) ON DELETE SET NULL
   );`,
 
     err => {
