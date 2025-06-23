@@ -42,7 +42,7 @@ const DB_NAME = 'robot_om_db';
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'dbs',
+  password: 'dustcleanrobot#$07',
   multipleStatements: true
 });
 
