@@ -112,7 +112,7 @@ db.connect(err => {
     payload JSON NOT NULL,
     status ENUM('pending', 'success', 'failure') DEFAULT 'pending',
     acknowledged_at DATETIME DEFAULT NULL,
-    created_by VARCHAR(24) NOT NULL,
+    created_by INT,
     created DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (robot_id) REFERENCES rtbl_robots(id) ON DELETE CASCADE,
     FOREIGN KEY (created_by) REFERENCES rtbl_accounts_dts(id) ON DELETE SET NULL
