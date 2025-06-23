@@ -42,7 +42,7 @@ const DB_NAME = 'robot_om_db';
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'dustcleanrobot#$07',
+  password: 'dbs',
   multipleStatements: true
 });
 
@@ -91,7 +91,7 @@ db.connect(err => {
     name VARCHAR(100) NOT NULL,
     macaddress VARCHAR(32) UNIQUE NOT NULL,
     model VARCHAR(50) NOT NULL,
-    location VARCHAR(24) NOT NULL,
+    location INT NOT NULL,
     comm_port VARCHAR(50),
     status ENUM('OPERATIONAL', 'INACTIVE', 'FAULT') DEFAULT 'OPERATIONAL',
     installation_date DATETIME,
