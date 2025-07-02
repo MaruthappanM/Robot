@@ -102,7 +102,7 @@ db.connect(err => {
          CREATE TABLE IF NOT EXISTS rtbl_locations (
            id VARCHAR(15) PRIMARY KEY,
            name VARCHAR(191) NOT NULL,
-           client_id INT NOT NULL,
+           client_id VARCHAR(10) NOT NULL,
            address_line1 VARCHAR(255),
            address_line2 VARCHAR(255),
            address_line3 VARCHAR(255),
@@ -119,7 +119,7 @@ db.connect(err => {
            name VARCHAR(100) NOT NULL,
            macaddress VARCHAR(32) UNIQUE NOT NULL,
            model VARCHAR(50) NOT NULL,
-           location VARCHAR(50) NOT NULL,
+           location VARCHAR(15) NOT NULL,
            comm_port VARCHAR(50),
            status ENUM('OPERATIONAL', 'INACTIVE', 'FAULT') DEFAULT 'OPERATIONAL',
            installation_date DATETIME,
