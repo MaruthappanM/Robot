@@ -394,7 +394,7 @@ app.get('/allclient', (req, res) => {
 // Get Client by ID
 app.get('/client/:id', (req, res) => {
     const token = req.headers['x-api-key'];
-    const clientId = parseInt(req.params.id);
+    const clientId = req.params.id;
     if (!token) return res.status(401).json({ error: 'Token required' });
 
     jwt.verify(token, SECRET_KEY, (err, decoded) => {
