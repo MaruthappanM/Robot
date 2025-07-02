@@ -354,7 +354,7 @@ app.post('/client', (req, res) => {
 
                 return res.status(200).json({
                     message: 'Client created successfully',
-                    clientId: result.insertId,
+                    clientId: id,
                     name
                 });
             }
