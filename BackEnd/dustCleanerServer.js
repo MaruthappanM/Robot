@@ -372,8 +372,7 @@ app.get('/allclient', (req, res) => {
         const userId = decoded.id;
 
         db.query(
-            `SELECT id, name FROM ${DB_NAME}.rtbl_clients WHERE created_by = ?`,
-            [userId],
+            `SELECT id, name FROM ${DB_NAME}.rtbl_clients`,
             (err, results) => {
                 if (err) return res.status(500).json({ error: 'Database error' });
 
@@ -402,8 +401,8 @@ app.get('/client/:id', (req, res) => {
         if (err) return res.status(403).json({ error: 'Invalid token' });
 
         db.query(
-            `SELECT id, name FROM ${DB_NAME}.rtbl_clients WHERE id = ? AND created_by = ?`,
-            [clientId, decoded.id],
+            `SELECT id, name FROM ${DB_NAME}.rtbl_clients WHERE id = ? `,
+            [clientId],
             (err, results) => {
                 if (err) return res.status(500).json({ error: 'Database error' });
                 if (results.length === 0) return res.status(404).json({ error: 'Client not found' });
@@ -434,8 +433,8 @@ app.patch('/client/:id', (req, res) => {
         if (err) return res.status(403).json({ error: 'Invalid token' });
 
         db.query(
-            `UPDATE ${DB_NAME}.rtbl_clients SET name = ? WHERE id = ? AND created_by = ?`,
-            [newName, clientId, decoded.id],
+            `UPDATE ${DB_NAME}.rtbl_clients SET name = ? WHERE id = ?`,
+            [newName, clientId],
             (err, result) => {
                 if (err) return res.status(500).json({ error: 'Database error' });
                 if (result.affectedRows === 0) return res.status(404).json({ error: 'Client not found or not owned' });
@@ -464,8 +463,8 @@ app.delete('/client/:id', (req, res) => {
         if (err) return res.status(403).json({ error: 'Invalid token' });
 
         db.query(
-            `DELETE FROM ${DB_NAME}.rtbl_clients WHERE id = ? AND created_by = ?`,
-            [clientId, decoded.id],
+            `DELETE FROM ${DB_NAME}.rtbl_clients WHERE id = ?`,
+            [clientId],
             (err, result) => {
                 if (err) return res.status(500).json({ error: 'Database error' });
                 if (result.affectedRows === 0) return res.status(404).json({ error: 'Client not found or not owned' });
@@ -540,7 +539,7 @@ app.get('/alllocation', (req, res) => {
     }
     const userId = decoded.id;
 
-    db.query(`SELECT * FROM ${DB_NAME}.rtbl_locations WHERE created_by = ?`, [userId], (err, results) => {
+    db.query(`SELECT * FROM ${DB_NAME}.rtbl_locations`, (err, results) => {
         if (err) return res.status(500).json({ error: 'Database read error' });
 
         const locations = results.map(row => ({
