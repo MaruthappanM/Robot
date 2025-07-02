@@ -93,16 +93,16 @@ db.connect(err => {
            blacklisted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
          );
          CREATE TABLE IF NOT EXISTS rtbl_clients (
-           id VARCHAR(10) PRIMARY KEY,
+           id VARCHAR(24) PRIMARY KEY,
            name VARCHAR(191) NOT NULL,
            created_by INT NOT NULL,
            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
            FOREIGN KEY (created_by) REFERENCES rtbl_accounts_dts(id)
          );
          CREATE TABLE IF NOT EXISTS rtbl_locations (
-           id VARCHAR(15) PRIMARY KEY,
+           id VARCHAR(24) PRIMARY KEY,
            name VARCHAR(191) NOT NULL,
-           client_id VARCHAR(10) NOT NULL,
+           client_id VARCHAR(24) NOT NULL,
            address_line1 VARCHAR(255),
            address_line2 VARCHAR(255),
            address_line3 VARCHAR(255),
@@ -119,7 +119,7 @@ db.connect(err => {
            name VARCHAR(100) NOT NULL,
            macaddress VARCHAR(32) UNIQUE NOT NULL,
            model VARCHAR(50) NOT NULL,
-           location VARCHAR(15) NOT NULL,
+           location VARCHAR(24) NOT NULL,
            comm_port VARCHAR(50),
            status ENUM('OPERATIONAL', 'INACTIVE', 'FAULT') DEFAULT 'OPERATIONAL',
            installation_date DATETIME,
@@ -340,7 +340,7 @@ app.post('/client', (req, res) => {
 
     if (!token) return res.status(401).json({ error: 'API key (token) required in x-api-key header' });
     if (!name) return res.status(400).json({ error: 'Client name is required' });
-    const id = randomUUID().replace(/-/g, '').slice(0, 10);
+    const id = randomUUID().replace(/-/g, '').slice(0, 24);
     jwt.verify(token, SECRET_KEY, (err, decoded) => {
         if (err) return res.status(403).json({ error: 'Invalid token' });
 
@@ -490,7 +490,7 @@ app.post('/location', (req, res) => {
         return res.status(403).json({ error: 'Invalid token' });
     }
     const userId = decoded.id;
-    const id = randomUUID().replace(/-/g, '').slice(0, 15);
+    const id = randomUUID().replace(/-/g, '').slice(0, 24);
     const { name, client, address } = req.body;
     const sql = `INSERT INTO ${DB_NAME}.rtbl_locations
         (id, name, client_id, address_line1, address_line2, address_line3, city, state, zip, country, created_by)
