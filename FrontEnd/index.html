@@ -191,7 +191,7 @@
 
     <h2>Create New Location</h2>
     <input id="locationName" placeholder="Location Name" /><br />
-    <input id="locationClient" placeholder="Client ID (24-digit)" /><br />
+    <input id="locationClient" placeholder="Client ID (10-digit)" /><br />
     <input id="addr1" placeholder="Address Line 1" /><br />
     <input id="addr2" placeholder="Address Line 2" /><br />
     <input id="addr3" placeholder="Address Line 3" /><br />
@@ -214,7 +214,7 @@
 
     <hr />
     <h2>Update Location</h2>
-    <input id="locIdUpdate" placeholder="Location ID (24-digit)" /><br />
+    <input id="locIdUpdate" placeholder="Location ID (15-digit)" /><br />
     <input id="locNameUpdate" placeholder="New Location Name" /><br />
     <input id="locClientIdUpdate" placeholder="Client ID (24-digit)" /><br />
     <input id="line1Update" placeholder="Address Line 1" /><br />
@@ -250,6 +250,7 @@
     <hr />
 
   <h2>Create New Robot</h2>
+   <input id="RobotId" placeholder="Robot ID (24-digit)" /><br />
   <input id="robotName" placeholder="Name" /><br/>
   <input id="robotMac" placeholder="MAC Address" /><br/>
   <input id="robotModel" placeholder="Model" /><br/>
@@ -668,6 +669,7 @@
     if (!token) return showResponse({ error: "You must be logged in" });
 
     const payload = {
+      id: document.getElementById("RobotId").value,
       name: document.getElementById("robotName").value,
       "mac-address": document.getElementById("robotMac").value,
       model: document.getElementById("robotModel").value,

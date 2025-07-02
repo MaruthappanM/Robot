@@ -93,14 +93,14 @@ db.connect(err => {
            blacklisted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
          );
          CREATE TABLE IF NOT EXISTS rtbl_clients (
-           id INT AUTO_INCREMENT PRIMARY KEY,
+           id VARCHAR(10) PRIMARY KEY,
            name VARCHAR(191) NOT NULL,
            created_by INT NOT NULL,
            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
            FOREIGN KEY (created_by) REFERENCES rtbl_accounts_dts(id)
          );
          CREATE TABLE IF NOT EXISTS rtbl_locations (
-           id INT AUTO_INCREMENT PRIMARY KEY,
+           id VARCHAR(15) PRIMARY KEY,
            name VARCHAR(191) NOT NULL,
            client_id INT NOT NULL,
            address_line1 VARCHAR(255),
@@ -119,7 +119,7 @@ db.connect(err => {
            name VARCHAR(100) NOT NULL,
            macaddress VARCHAR(32) UNIQUE NOT NULL,
            model VARCHAR(50) NOT NULL,
-           location INT NOT NULL,
+           location VARCHAR(50) NOT NULL,
            comm_port VARCHAR(50),
            status ENUM('OPERATIONAL', 'INACTIVE', 'FAULT') DEFAULT 'OPERATIONAL',
            installation_date DATETIME,
@@ -152,7 +152,6 @@ db.connect(err => {
         }
     );
 });
-
 // --- Authentication Routes ---
 
 // Signup
@@ -341,15 +340,15 @@ app.post('/client', (req, res) => {
 
     if (!token) return res.status(401).json({ error: 'API key (token) required in x-api-key header' });
     if (!name) return res.status(400).json({ error: 'Client name is required' });
-
+    const id = randomUUID().replace(/-/g, '').slice(0, 10);
     jwt.verify(token, SECRET_KEY, (err, decoded) => {
         if (err) return res.status(403).json({ error: 'Invalid token' });
 
         const userId = decoded.id;
 
         db.query(
-            `INSERT INTO ${DB_NAME}.rtbl_clients (name, created_by) VALUES (?, ?)`,
-            [name, userId],
+            `INSERT INTO ${DB_NAME}.rtbl_clients (id, name, created_by) VALUES (?, ?, ?)`,
+            [id, name, userId],
             (err, result) => {
                 if (err) return res.status(500).json({ error: 'Failed to create client' });
 
@@ -491,13 +490,14 @@ app.post('/location', (req, res) => {
         return res.status(403).json({ error: 'Invalid token' });
     }
     const userId = decoded.id;
-
+    const id = randomUUID().replace(/-/g, '').slice(0, 15);
     const { name, client, address } = req.body;
     const sql = `INSERT INTO ${DB_NAME}.rtbl_locations
-        (name, client_id, address_line1, address_line2, address_line3, city, state, zip, country, created_by)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        (id, name, client_id, address_line1, address_line2, address_line3, city, state, zip, country, created_by)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const values = [
+        id,
         name,
         parseInt(client, 16),
         address['line-1'],
@@ -513,11 +513,11 @@ app.post('/location', (req, res) => {
     db.query(sql, values, (err, result) => {
         if (err) return res.status(500).json({ error: 'Database insert error' });
 
-        const locationId = result.insertId.toString(16).padStart(24, '0');
+        // const locationId = result.insertId.toString(16).padStart(24, '0');
         res.status(200).json({
             message: 'New location registered',
             location: {
-                _id: locationId,
+                _id: id,
                 name,
                 client,
                 address,
@@ -766,17 +766,17 @@ app.post('/solar-robot', (req, res) => {
 
     const data = req.body;
     const id = randomUUID().replace(/-/g, '').slice(0, 24);
-    const mac = data['mac-address'];
+    const uniqueid = data['uniqueid'];
 
     // Step 1: Check if mac address exists
-    db.query('SELECT id FROM rtbl_robots WHERE macaddress = ?', [mac], (err, results) => {
+    db.query('SELECT id FROM rtbl_robots WHERE id = ?', [uniqueid], (err, results) => {
         if (err) {
             console.error('DB Check Error:', err);
             return res.status(500).json({ error: 'Database error', detail: err.message });
         }
 
         if (results.length > 0) {
-            return res.status(409).json({ error: 'MAC address already exists' });
+            return res.status(409).json({ error: 'Serial Number already exists' });
         }
 
         // Step 2: Proceed to insert
@@ -787,9 +787,9 @@ app.post('/solar-robot', (req, res) => {
         `;
 
         const values = [
-            id,
+            data['uniqueid'],
             data['name'] || '',
-            mac,
+            data['mac-address'] || '',
             data['model'] || '',
             data['location'] || '',
             data['comm-port'] || '',
@@ -808,7 +808,7 @@ app.post('/solar-robot', (req, res) => {
             res.json({
                 message: 'New solar robot registered',
                 'solar-robot': {
-                    _id: id,
+                    _id: uniqueid,
                     ...data,
                     'created-by': decoded.id,
                     'updated-by': decoded.id,
@@ -1045,7 +1045,7 @@ app.patch('/solar-robot/command/:id', (req, res) => {
         db.query(insertSql, [commandId, robotId, command, JSON.stringify(payload), 'pending', decoded.id], (err2) => {
             if (err2) return res.status(500).json({ error: 'Insert error', detail: err2.message });
 
-            const topic = `robot/${robotId}/commands`;
+            const topic = `robot/${robotId}/command`;
             mqttClient.publish(topic, JSON.stringify(payload), { qos: 1 }, (publishErr) => {
                 if (publishErr) {
                     console.error('Failed to publish to AWS IoT:', publishErr);
@@ -1057,7 +1057,7 @@ app.patch('/solar-robot/command/:id', (req, res) => {
                 }
             });
 
-            const ackTopic = `robot/${robotId}/ack`;
+            const ackTopic = `robot/${robotId}/response`;
 
             // Subscribe to the ACK topic to receive the response from the robot.
             // This needs to be done *before* the command is published, or very quickly after.
