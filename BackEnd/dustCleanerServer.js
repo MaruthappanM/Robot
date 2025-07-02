@@ -498,7 +498,7 @@ app.post('/location', (req, res) => {
     const values = [
         id,
         name,
-        parseInt(client, 16),
+        client,
         address['line-1'],
         address['line-2'],
         address['line-3'],
