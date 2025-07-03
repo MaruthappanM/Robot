@@ -424,7 +424,7 @@ app.get('/client/:id', (req, res) => {
 app.patch('/client/:id', (req, res) => {
     const token = req.headers['x-api-key'];
     const newName = req.body.name;
-    const clientId = parseInt(req.params.id);
+    const clientId = req.params.id;
 
     if (!token) return res.status(401).json({ error: 'Token required' });
     if (!newName) return res.status(400).json({ error: 'Client name required' });
@@ -455,7 +455,7 @@ app.patch('/client/:id', (req, res) => {
 // Delete Client
 app.delete('/client/:id', (req, res) => {
     const token = req.headers['x-api-key'];
-    const clientId = parseInt(req.params.id);
+    const clientId = req.params.id;
 
     if (!token) return res.status(401).json({ error: 'Token required' });
 
@@ -577,7 +577,7 @@ app.get('/location/:id', (req, res) => {
         return res.status(403).json({ error: 'Invalid token' });
     }
 
-    const locationId = parseInt(req.params.id, 16);
+    const locationId = req.params.id;
 
     db.query(`SELECT * FROM ${DB_NAME}.rtbl_locations WHERE id = ?`, [locationId], (err, results) => {
         if (err) return res.status(500).json({ error: 'Database read error' });
@@ -616,7 +616,7 @@ app.patch('/location/:id', (req, res) => {
         return res.status(403).json({ error: 'Invalid token' });
     }
 
-    const locationId = parseInt(req.params.id, 16);
+    const locationId = req.params.id;
     const {
         name, client_id,
         address_line1, address_line2, address_line3,
@@ -633,7 +633,7 @@ app.patch('/location/:id', (req, res) => {
     }
     if (client_id) {
         fields.push("client_id = ?");
-        values.push(parseInt(client_id, 16));
+        values.push(client_id, 16);
     }
     if (address_line1) {
         fields.push("address_line1 = ?");
@@ -718,7 +718,7 @@ app.delete('/location/:id', (req, res) => {
         return res.status(403).json({ error: 'Invalid token' });
     }
 
-    const locationId = parseInt(req.params.id, 16);
+    const locationId = req.params.id;
 
     db.query(`SELECT * FROM ${DB_NAME}.rtbl_locations WHERE id = ?`, [locationId], (err, results) => {
         if (err || results.length === 0) return res.status(404).json({ error: 'Location not found' });
