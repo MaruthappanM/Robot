@@ -1049,7 +1049,7 @@ app.patch('/solar-robot/command/:id', (req, res) => {
                 if (publishErr) {
                     console.error('Failed to publish to AWS IoT:', publishErr);
                     // It's crucial to handle errors immediately if publish fails
-                    updateAfterAck({ status: 'failure', reason: 'Failed to publish to AWS IoT', originalError: publishErr });
+                    updateAfterAck({ Response: 'failure', reason: 'Failed to publish to AWS IoT', originalError: publishErr });
                     return; // Prevent further execution if publish fails
                 } else {
                     console.log(`Published command to AWS IoT topic: ${topic}`);
@@ -1063,7 +1063,7 @@ app.patch('/solar-robot/command/:id', (req, res) => {
             mqttClient.subscribe(ackTopic, (subscribeErr) => {
                 if (subscribeErr) {
                     console.error(`Failed to subscribe to ACK topic ${ackTopic}:`, subscribeErr);
-                    updateAfterAck({ status: 'failure', reason: 'Failed to subscribe to ACK topic', originalError: subscribeErr });
+                    updateAfterAck({ Response: 'failure', reason: 'Failed to subscribe to ACK topic', originalError: subscribeErr });
                     return; // Prevent further execution if subscription fails
                 }
                 console.log(`Subscribed to ACK topic: ${ackTopic}`);
@@ -1076,7 +1076,7 @@ app.patch('/solar-robot/command/:id', (req, res) => {
                 mqttClient.unsubscribe(ackTopic, (err) => {
                     if(err) console.error(`Error unsubscribing from ${ackTopic} on timeout:`, err);
                 });
-                updateAfterAck({ status: 'failure', reason: 'timeout' });
+                updateAfterAck({ Response: 'failure', reason: 'timeout' });
             }, 15000); // 15 seconds timeout
 
             let ackReceived = false; // Flag to ensure `updateAfterAck` is called only once
@@ -1094,9 +1094,9 @@ app.patch('/solar-robot/command/:id', (req, res) => {
 
                     try {
                         const data = JSON.parse(message.toString());
-                        updateAfterAck({ status: 'success', ...data });
+                        updateAfterAck({ Response: 'success', ...data });
                     } catch (parseError) {
-                        updateAfterAck({ status: 'failure', reason: 'invalid JSON in ACK', originalError: parseError });
+                        updateAfterAck({ Response: 'failure', reason: 'invalid JSON in ACK', originalError: parseError });
                     }
                 }
             };
@@ -1142,7 +1142,7 @@ app.patch('/solar-robot/command/:id', (req, res) => {
                                     "solar-robot": {
                                         "user-setting": userSetting,
                                         "reported-operation": reportedOperation,
-                                        "acknowledgment-status": ack.status,
+                                        "acknowledgment-status": ack.Response,
                                         "acknowledgment-reason": ack.reason || 'N/A',
                                         // Include full robot details from the 'robot' object
                                         _id: robot.id,
@@ -1157,6 +1157,7 @@ app.patch('/solar-robot/command/:id', (req, res) => {
                                         created: robot.created,
                                         "updated-by": robot.updated_by,
                                         updated: robot.updated,
+                                        mqttres : ack,
                                         __v: 0
                                     }
                                 });
