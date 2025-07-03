@@ -669,7 +669,7 @@
     if (!token) return showResponse({ error: "You must be logged in" });
 
     const payload = {
-      id: document.getElementById("RobotId").value,
+      uniqueid: document.getElementById("RobotId").value,
       name: document.getElementById("robotName").value,
       "mac-address": document.getElementById("robotMac").value,
       model: document.getElementById("robotModel").value,
